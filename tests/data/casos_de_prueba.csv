@@ -1,0 +1,16 @@
+﻿caso_id,pedido_id,accion,resultado_esperado,nota
+CP01,1,confirmar,"CONFIRMED, cobro 120.00",
+CP02,2,confirmar,"CONFIRMED, cobro 170.00",
+CP03,3,confirmar,CustomerHasDebt,
+CP04,4,confirmar,ValueError,
+CP05,5,confirmar,ValueError,
+CP06,6,confirmar,"CONFIRMED, cobro 850.00",
+CP07,7,confirmar,"CONFIRMED, cobro 0.01",
+CP08,8,confirmar,CONFIRMED (comportamiento actual; ampliar con TDD),Caso TDD: no confirmar dos veces
+CP09,9,confirmar,"CONFIRMED, cobro 255.00",
+CP10,10,confirmar,"CONFIRMED, cobro 75.00",
+CP11,11,confirmar,CustomerHasDebt,
+CP12,12,confirmar,"CONFIRMED, cobro 84.99",
+CP13,,pago rechazado,RuntimeError: payment rejected,Usar mock del gateway
+CP14,,persistencia commit,Registro visible después de commit,Usar SqlOrderRepository
+CP15,,persistencia rollback,Registro ausente después de rollback,Usar SqlOrderRepository
