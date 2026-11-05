@@ -32,4 +32,4 @@ def test_owner_allowed_just_before_24h():
 
 def test_default_now_is_used_when_not_given():
     created = datetime.now(UTC)
-    assert can_cancel("NEW", 1, 1, False, created)  # cubre la rama now=None
+    assert can_cancel("NEW", 1, 1, False, created)
