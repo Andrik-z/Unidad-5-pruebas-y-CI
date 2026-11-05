@@ -1,0 +1,35 @@
+id,regla,origen,entrada,resultado_esperado,tipo,prueba
+CP-01,R1 Anticipo mínimo 20 %,US-08/US-10,total=1000.00; pago=200.00 (exacto),CONFIRMADO; vence a 30 días; saldo=800.00,Límite,test_cp01_anticipo_exacto_20_por_ciento_confirma
+CP-02,R1 Anticipo mínimo 20 %,US-08,total=1000.00; pago=199.99,AnticipoInsuficiente; sigue en reserva temporal,Error,test_cp02_un_centavo_menos_del_20_por_ciento_se_rechaza
+CP-03,R1 Anticipo mínimo 20 %,US-10,total=1000.00; pago=350.00,CONFIRMADO; saldo=650.00,Éxito,test_cp03_anticipo_mayor_al_minimo_reduce_el_saldo
+CP-04,R1 Anticipo mínimo 20 %,US-08,total=999.99 (20 % = 199.998),mínimo=200.00; 199.99 rechazado; 200.00 aceptado,Límite,test_cp04_redondeo_del_minimo_a_centavos
+CP-05,R2 Máximo 5 artículos,US-08,0 activos + 5 nuevos,Apartado creado,Límite,test_cp05_cinco_articulos_es_el_limite_permitido
+CP-06,R2 Máximo 5 artículos,US-08,0 activos + 6 nuevos,LimiteArticulosExcedido,Error,test_cp06_seis_articulos_excede_el_limite
+CP-07,R2 Máximo 5 artículos,US-08,3 activos + 2 nuevos; 3 activos + 3 nuevos,Permitido (5); rechazado (6),Límite,test_cp07_cuenta_los_articulos_activos_previos_del_cliente
+CP-08,R2 Máximo 5 artículos,US-08,cantidad=0; lista vacía,ValueError,Error,test_cp08_cantidad_cero_o_lista_vacia_es_invalida
+CP-09,R3 Reserva temporal 15 min,US-09/US-10,pago a los 14 min 59 s,CONFIRMADO,Límite,test_cp09_pago_un_segundo_antes_de_15_min_confirma
+CP-10,R3 Reserva temporal 15 min,US-09,pago a los 15 min exactos,ReservaExpirada (supuesto: 15:00 ya expiró),Límite,test_cp10_pago_a_los_15_min_exactos_ya_no_es_valido
+CP-11,R3 Reserva temporal 15 min,US-09,expirar a los 14 min y a los 15 min,False y sigue en reserva; True y EXPIRADO,Límite,test_cp11_la_reserva_temporal_expira_a_los_15_min
+CP-12,R4 Vencimiento 30 días,US-11,liquidar el día 29 con saldo exacto,LIQUIDADO,Éxito,test_cp12_liquidar_el_dia_29_con_saldo_exacto
+CP-13,R4 Vencimiento 30 días,US-11/US-12,liquidar a los 30 días exactos,PlazoVencido (supuesto: día 30 ya venció),Límite,test_cp13_liquidar_a_los_30_dias_exactos_ya_es_extemporaneo
+CP-14,R4 Vencimiento 30 días,US-11,liquidar con 799.99 de 800.00,SaldoIncompleto,Error,test_cp14_liquidar_exige_el_saldo_completo
+CP-15,R4 Vencimiento 30 días,US-12,vencer a 29 d 23 h y a 30 d,False; VENCIDO,Límite,test_cp15_vencer_solo_cuando_cumple_30_dias
+CP-16,R4 Transiciones válidas,Etapa 3 (Aggregate Apartado),anticipo dos veces; liquidar sin confirmar,TransicionInvalida,Error,test_cp16_transiciones_invalidas_se_rechazan
+CP-17,R5 Monedero idempotente,US-12,abonar el mismo apartado dos veces,Saldo=200.00 (abona una sola vez),Error,test_cp17_un_apartado_vencido_abona_una_sola_vez
+CP-18,R5 Saldo nunca negativo,Etapa 3 (Aggregate Monedero),descontar 200.00 y luego 0.01 con saldo 200.00,Saldo=0.00; luego SaldoInsuficiente,Límite,test_cp18_el_saldo_del_monedero_nunca_es_negativo
+CP-19,R6 Producto apartado no se vende,BRD 5.2,vender unidad APARTADO,ProductoApartado,Error,test_cp19_unidad_apartada_no_puede_venderse
+CP-20,R6 Producto apartado no se vende,US-13,vender unidad DISPONIBLE,VENDIDO; existencia 3 -> 2,Éxito,test_cp20_unidad_disponible_se_vende_y_baja_la_existencia
+CP-21,R6 Unidad en tránsito no vendible,Etapa 3 (Inventario),vender unidad EN_TRANSITO,UnidadNoDisponible,Error,test_cp21_unidad_en_transito_no_es_vendible
+CP-22,R6 Número de serie único,US-16,serie duplicada; serie inexistente,ValueError; UnidadNoDisponible,Error,test_cp22_serie_duplicada_o_inexistente_se_rechaza
+CP-23,R6 Apartar y liberar,US-09,apartar y liberar; liberar no apartada,existencia 2 -> 3; UnidadNoDisponible,Éxito,test_cp23_apartar_y_liberar_devuelve_la_unidad_al_piso_de_ventas
+CP-24,R7 Cobro con pasarela (mock),US-13,gateway.charge=True; 2 unidades de 8500.00,PAGADA; QR; unidades VENDIDO; charge(17000.00) una vez,Éxito,test_cp24_pago_aprobado_genera_comprobante_y_descuenta_inventario
+CP-25,R7 Cobro con pasarela (mock),US-14,gateway.charge=False,PagoDeclinado; CANCELADA; sin QR; inventario intacto,Error,test_cp25_pago_declinado_cancela_la_venta_sin_tocar_el_inventario
+CP-26,R7 No cobrar producto apartado,BRD 5.2,venta de unidad apartada,ProductoApartado; charge NO se llama,Error,test_cp26_nunca_se_cobra_un_producto_apartado
+CP-27,R7 Invariantes de la venta,Etapa 3 (Aggregate Venta),venta sin líneas; pagar dos veces; cancelar pagada,ValueError; TransicionInvalida,Error,test_cp27_invariantes_de_la_venta
+CP-28,Persistencia commit,Paso 4 del lab,guardar apartado + commit; leer en otra sesión,Registro visible con mismos datos,Éxito,test_cp28_commit_persiste_el_apartado_y_otra_sesion_lo_ve
+CP-29,Persistencia rollback,Paso 4 del lab,guardar apartado + rollback,Registro ausente,Error,test_cp29_rollback_descarta_el_apartado
+CP-30,R2 Máximo 5 artículos (con BD),US-08,3 guardados + 3 nuevos; 3 guardados + 2 nuevos,LimiteArticulosExcedido sin guardar; luego permitido,Límite,test_cp30_el_limite_de_5_articulos_considera_los_apartados_guardados
+CP-31,R1 Confirmar apartado (con BD),US-10,iniciar y confirmar con 200.00; apartado inexistente,CONFIRMADO persistido; ApartadoNoEncontrado,Éxito,test_cp31_confirmar_apartado_persiste_el_estado_y_la_fecha_de_vencimiento
+CP-32,R5 Vencimiento y monedero (con BD),US-12,procesar a día 29; día 30; día 31,0; 1 (VENCIDO + monedero 200.00); 0 (sin doble abono),Límite,test_cp32_vencimiento_abona_al_monedero_una_sola_vez
+CP-33,R5 Rollback transaccional,Paso 4 del lab,monedero falla al guardar,RuntimeError; apartado sigue CONFIRMADO,Error,test_cp33_si_falla_el_monedero_se_hace_rollback_y_el_apartado_sigue_confirmado
+CP-34,R4 Reserva sin vencimiento,US-12,reserva temporal sin confirmar,vence_en=None; nunca vencida,Límite,test_cp34_una_reserva_temporal_aun_no_tiene_fecha_de_vencimiento
